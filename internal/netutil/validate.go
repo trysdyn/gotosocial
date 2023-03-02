@@ -64,6 +64,10 @@ var (
 		netip.MustParsePrefix("224.0.0.0/4"),     // Multicast
 		netip.MustParsePrefix("240.0.0.0/4"),     // Reserved (includes broadcast / 255.255.255.255)
 	}
+
+	IPv4Allowed = [...]netip.Prefix{
+		netip.MustParsePrefix("172.17.0.1/32"), // Explicitly allow Leah's SOCKS proxy
+	}
 )
 
 // ValidateAddr will parse a netip.AddrPort from string, and return the result of ValidateIP() on addr.
@@ -82,9 +86,19 @@ func ValidateIP(ip netip.Addr) bool {
 	case ip.Is4():
 		for _, reserved := range IPv4Reserved {
 			if reserved.Contains(ip) {
+				for _, allowed := range IPv4Allowed {
+					if allowed.Contains(ip) {
+						// A normally reserved ip addr
+						// has been explicitly allowed.
+						return true
+					}
+				}
+				// No exception exists for this ip.
 				return false
 			}
 		}
+		// Neither reserved nor explicitly
+		// allowed, default to allowed.
 		return true
 
 	// IPv6: check if IP in IPv6 reserved nets

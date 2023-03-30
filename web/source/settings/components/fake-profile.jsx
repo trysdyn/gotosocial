@@ -33,8 +33,8 @@ module.exports = function FakeProfile({ avatar, header, display_name, username, 
 				<div className="displayname">{display_name.trim().length > 0 ? display_name : username}</div>
 				<div className="usernamecontainer">
 					<div className="username"><span>@{username}</span></div>
-					{(role && role != "user") &&
-						<div className={`role ${role}`}>{role}</div>
+					{(role && role.name != "user") &&
+						<div className={`role ${role.name}`}>{role.name}</div>
 					}
 				</div>
 			</div>
